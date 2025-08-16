@@ -1,0 +1,62 @@
+{
+  "users": {
+    "valid": {
+      "name": "Fulano da Silva",
+      "email": "fulano@qa.com",
+      "password": "teste"
+    },
+    "admin": {
+      "name": "Admin Test",
+      "email": "admin@qa.com", 
+      "password": "test123",
+      "isAdmin": "true"
+    },
+    "invalidEmail": {
+      "name": "Test User",
+      "email": "invalid-email",
+      "password": "test123"
+    },
+    "invalidCredentials": {
+      "email": "nonexistent@user.com",
+      "password": "wrongpassword123"
+    }
+  },
+  "products": {
+    "valid": {
+      "name": "Automated Test Product",
+      "price": "100",
+      "description": "Test product description",
+      "quantity": "50"
+    }
+  },
+  "search": {
+    "term": "produto"
+  },
+  "navigation": {
+    "paths": {
+      "home": "/home",
+      "login": "/login",
+      "registration": "/cadastrarusuarios",
+      "root": "/"
+    },
+    "links": {
+      "products": "a:contains(\"Produtos\"), a:contains(\"Listar\")",
+      "logout": "button:contains(\"Logout\"), a:contains(\"Logout\"), a:contains(\"Sair\")"
+    },
+    "selectors": {
+      "search": "input[type=\"search\"], input[placeholder*=\"pesquis\"], input[placeholder*=\"busca\"]"
+    }
+  },
+  "timing": {
+    "short": 1000,
+    "medium": 2000
+  },
+  "viewport": {
+    "desktop": { "width": 1280, "height": 720 },
+    "tablet": { "width": 768, "height": 1024 },
+    "mobile": { "width": 375, "height": 667 }
+  },
+  "messages": {
+    "success": "sucesso"
+  }
+}
