@@ -1,0 +1,27 @@
+{
+  "name": "cypress-frontend-automation",
+  "version": "1.0.0",
+  "description": "Projeto de automação E2E com Cypress para frontend ServeRest",
+  "main": "index.js",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:headed": "cypress run --headed",
+    "cy:run:chrome": "cypress run --browser chrome",
+    "test": "cypress run",
+    "test:headed": "cypress run --headed --browser chrome"
+  },
+  "keywords": [
+    "cypress",
+    "e2e",
+    "automation",
+    "testing",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "cypress": "^13.6.0"
+  },
+  "dependencies": {}
+}
