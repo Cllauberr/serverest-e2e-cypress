@@ -1,25 +1,55 @@
 {
   "users": {
     "valid": {
-      "name": "Fulano da Silva",
-      "email": "fulano@qa.com",
-      "password": "teste"
+      "name": "Valido da Silva",
+      "email": "adminautomatizador@qa.com",
+      "password": "test123"
     },
     "admin": {
-      "name": "Admin Test",
-      "email": "admin@qa.com", 
+      "name": "Admin Test da Silva",
+      "email": "adminautomatizador@qa.com", 
       "password": "test123",
       "isAdmin": "true"
     },
     "invalidEmail": {
-      "name": "Test User",
-      "email": "invalid-email",
+      "name": "Invalido da Silva",
+      "email": "emailmuitoinvalido@qa.com",
       "password": "test123"
     },
     "invalidCredentials": {
-      "email": "nonexistent@user.com",
-      "password": "wrongpassword123"
+      "email": "naoexiste@user.com",
+      "password": "senhasenhasenha"
     }
+  },
+  "api": {
+    "baseUrl": "https://serverest.dev",
+    "endpoints": {
+      "login": "/login",
+      "register": "/usuarios",
+      "delete": "/usuarios/",
+      "products": "/produtos",
+      "shoppingCart": "/carrinhos"
+    },
+    "statusCode": {
+      "success": 200,
+      "created": 201,
+      "badRequest": 400,
+      "unauthorized": 401,
+      "forbidden": 403,
+      "notFound": 404,
+      "serverError": 500
+    },
+    "messages": {
+      "loginSuccess": "Login realizado com sucesso",
+      "loginFailed": "Email e/ou senha inválidos",
+      "userCreated": "Cadastro realizado com sucesso",
+      "userExists": "Este email já está sendo usado",
+      "userDeleted": "Registro excluído com sucesso"
+    }
+  },
+  "headers": {
+    "Authorization": "Bearer <token>",
+    "Content-Type": "application/json"
   },
   "products": {
     "valid": {
