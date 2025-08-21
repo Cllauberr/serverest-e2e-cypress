@@ -1,6 +1,6 @@
-import RegisterPage from '../pages/RegisterPage'
-import LoginPage from '../pages/LoginPage'
-import RegisterPageElements from '../page-elements/RegisterPageElements'
+import RegisterPage from '../../pages/RegisterPage'
+import LoginPage from '../../pages/LoginPage'
+import RegisterPageElements from '../../page-elements/RegisterPageElements'
 
 describe('E2E Tests - User Registration', () => {
   const registerPage = new RegisterPage()

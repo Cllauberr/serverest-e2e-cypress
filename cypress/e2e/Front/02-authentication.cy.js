@@ -1,6 +1,6 @@
-import LoginPage from '../pages/LoginPage'
-import HomePage from '../pages/HomePage'
-import LoginPageElements from '../page-elements/LoginPageElements'
+import LoginPage from '../../pages/LoginPage'
+import HomePage from '../../pages/HomePage'
+import LoginPageElements from '../../page-elements/LoginPageElements'
 
 describe('E2E Tests - User Authentication', () => {
   const loginPage = new LoginPage()

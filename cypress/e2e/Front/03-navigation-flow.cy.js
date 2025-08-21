@@ -1,5 +1,5 @@
-import LoginPage from '../pages/LoginPage'
-import HomePage from '../pages/HomePage'
+import LoginPage from '../../pages/LoginPage'
+import HomePage from '../../pages/HomePage'
 
 describe('E2E Tests - Navigation and User Flow', () => {
   const loginPage = new LoginPage()
