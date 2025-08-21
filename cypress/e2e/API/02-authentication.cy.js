@@ -19,4 +19,46 @@ describe('API Tests - Authentication', () => {
         })
     })
 
+    it('should fail login with invalid credentials via API', () => {
+        cy.fixture('testData').then((testData) => {
+            cy.request({
+                method: 'POST',
+                url: `${testData.api.baseUrl}${testData.api.endpoints.login}`,
+                body: {
+                    email: testData.users.invalidCredentials.email,
+                    password: testData.users.invalidCredentials.password
+                },
+                failOnStatusCode: false
+            }).then((response) => {
+                // Validações do status de erro
+                expect(response.status).to.eq(401)
+                expect(response.statusText).to.eq('Unauthorized')
+                
+                // Validações do corpo da resposta de erro
+                expect(response.body).to.have.property('message')
+                expect(response.body.message).to.eq(testData.api.messages.loginFailed)
+                
+                // Validação que não retorna token
+                expect(response.body).to.not.have.property('authorization')
+            })
+        })
+    })
+
+    it('should fail login with missing required fields via API', () => {
+        cy.fixture('testData').then((testData) => {
+            // Teste sem email
+            cy.request({
+                method: 'POST',
+                url: `${testData.api.baseUrl}${testData.api.endpoints.login}`,
+                body: {
+                    password: 'test123'
+                },
+                failOnStatusCode: false
+            }).then((response) => {
+                expect(response.status).to.eq(400)
+                expect(response.body).to.have.property('email')
+                expect(response.body.email).to.include('obrigatório')
+            })
+        })
+    })
 })
