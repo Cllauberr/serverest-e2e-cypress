@@ -1,5 +1,6 @@
 import LoginPageElements from '../page-elements/LoginPageElements'
 import RegisterPageElements from '../page-elements/RegisterPageElements'
+import '@bahmutov/cy-api'
 
 // login
 Cypress.Commands.add('loginUser', (email, password) => {
@@ -37,6 +38,25 @@ Cypress.Commands.add('authenticateUser', (userData = null) => {
 })
 
 // API Commands
+
+//Realiza o login e retorna o token de autorização
+Cypress.Commands.add('getAuthToken', (email = null, password = null) => {
+  return cy.fixture('testData').then((testData) => {
+    const auth = {
+      email: email || testData.users.valid.email,
+      password: password || testData.users.valid.password
+    }
+    return cy.request({
+      method: 'POST',
+      url: `${testData.api.baseUrl}${testData.api.endpoints.login}`,
+      body: auth
+    }).then((response) => {
+      expect(response.status).to.eq(testData.api.statusCode.success)
+      expect(response.body).to.have.property('authorization')
+      return response.body.authorization
+    })
+  })
+})
 
 //Realiza o login de sucesso
 Cypress.Commands.add('apiLogin', (email = null, password = null) => {
@@ -92,6 +112,98 @@ Cypress.Commands.add('apiDeleteUser', (userId) => {
       expect(response.body).to.have.property('message')
       expect(response.body.message).to.eq(testData.api.messages.userDeleted)
       return response
+    })
+  })
+})
+
+//Realiza a busca de um usuário por ID
+Cypress.Commands.add('apiFindUser', (userId = null) => {
+  cy.fixture('testData').then((testData) => {
+    const findUserId = userId || testData.users.valid._id
+    
+    cy.request({
+      method: 'GET',
+      url: `${testData.api.baseUrl}${testData.api.endpoints.find}${findUserId}`
+    }).then((response) => {
+      expect(response.status).to.eq(testData.api.statusCode.success)
+      expect(response.body).to.have.property('_id', findUserId)
+      return response
+    })
+  })
+})
+
+//Realiza o cadastro de um produto
+Cypress.Commands.add('apiCreateProduct', (productData = null) => {
+  return cy.fixture('testData').then((testData) => {
+    const timestamp = Date.now()
+    const product = productData || {
+      ...testData.api.productData,
+      nome: `${testData.api.productData.nome} ${timestamp}`
+    }
+
+    // Obter o token de autorização usando o comando getAuthToken
+    return cy.getAuthToken().then((authToken) => {
+      return cy.api({
+        method: 'POST',
+        url: `${testData.api.baseUrl}${testData.api.endpoints.products}`,
+        headers: {
+          'Authorization': authToken
+        },
+        body: product
+      }).then((response) => {
+        expect(response.status).to.eq(testData.api.statusCode.created)
+        return response
+      })
+    })
+  })
+})
+
+//Realiza a busca de um produto
+Cypress.Commands.add('apiFindProduct', () => {
+  cy.fixture('testData').then((testData) => {
+    //Cria um produto
+    cy.apiCreateProduct().then((createResponse) => {
+      const productId = createResponse.body._id
+
+      // Validações da criação
+      expect(createResponse.status).to.eq(201)
+      expect(productId).to.exist
+
+      // Busca o produto usando o ID
+      cy.api({
+        method: 'GET',
+        url: `${testData.api.baseUrl}${testData.api.endpoints.productsFind}${productId}`
+      }).then((response) => {
+        expect(response.status).to.eq(testData.api.statusCode.success)
+        return response
+      })
+    })
+  })
+})
+
+//Realiza a deleção de um produto
+Cypress.Commands.add('apiDeleteProduct', () => {
+  return cy.fixture('testData').then((testData) => {
+    return cy.apiCreateProduct().then((createResponse) => {
+      const productId = createResponse.body._id
+
+      // Validações da criação
+      expect(createResponse.status).to.eq(201)
+      expect(productId).to.exist
+      
+      // Obter token para deleção
+      return cy.getAuthToken().then((authToken) => {
+        return cy.api({
+          method: 'DELETE',
+          url: `${testData.api.baseUrl}${testData.api.endpoints.productsDelete}${productId}`,
+          headers: {
+            'Authorization': authToken
+          }
+        }).then((response) => {
+          expect(response.status).to.eq(testData.api.statusCode.success)
+          return response
+        })
+      })
     })
   })
 })
