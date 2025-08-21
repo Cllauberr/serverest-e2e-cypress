@@ -3,7 +3,8 @@
     "valid": {
       "name": "Valido da Silva",
       "email": "adminautomatizador@qa.com",
-      "password": "test123"
+      "password": "test123",
+      "_id": "moui4Nlp9jyEkBTE"
     },
     "admin": {
       "name": "Admin Test da Silva",
@@ -26,8 +27,11 @@
     "endpoints": {
       "login": "/login",
       "register": "/usuarios",
+      "find": "/usuarios/",
       "delete": "/usuarios/",
       "products": "/produtos",
+      "productsFind": "/produtos/",
+      "productsDelete": "/produtos/",
       "shoppingCart": "/carrinhos"
     },
     "statusCode": {
@@ -44,7 +48,16 @@
       "loginFailed": "Email e/ou senha inválidos",
       "userCreated": "Cadastro realizado com sucesso",
       "userExists": "Este email já está sendo usado",
-      "userDeleted": "Registro excluído com sucesso"
+      "userDeleted": "Registro excluído com sucesso",
+      "userFound": "Usuário não encontrado",
+      "productCreated": "Cadastro realizado com sucesso",
+      "productDeleted": "Registro excluído com sucesso"
+    },
+    "productData": {
+      "nome": "Produto Teste Automatizado",
+      "preco": 100,
+      "descricao": "Produto criado via automação de testes",
+      "quantidade": 5
     }
   },
   "headers": {
@@ -53,10 +66,10 @@
   },
   "products": {
     "valid": {
-      "name": "Automated Test Product",
-      "price": "100",
-      "description": "Test product description",
-      "quantity": "50"
+      "name": "GTA 6",
+      "price": "500",
+      "description": "jogo de ação",
+      "quantity": "1"
     }
   },
   "search": {
