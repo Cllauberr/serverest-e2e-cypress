@@ -21,7 +21,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@bahmutov/cy-api": "^2.2.8",
     "cypress": "^13.6.0"
-  },
-  "dependencies": {}
+  }
 }
