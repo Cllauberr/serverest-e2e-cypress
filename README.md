@@ -11,30 +11,52 @@ Este projeto implementa testes end-to-end automatizados para o frontend da aplic
 
 ## Cenários de Teste Implementados
 
-### 1. Autenticação de Usuário (01-authentication.cy.js)
+### 1. Autenticação de Usuário
+**Frontend (02-authentication.cy.js)**
 - Login com credenciais válidas
 - Login com credenciais inválidas
 - Validação de campos obrigatórios
 
-### 2. Registro de Usuário (02-user-registration.cy.js)
+**API (02-authentication.cy.js)**
+- Login bem-sucedido via API
+- Falha de login com credenciais inválidas via API
+- Falha de login com campos obrigatórios ausentes via API
+
+### 2. Registro de Usuário
+**Frontend (01-user-registration.cy.js)**
 - Registro bem-sucedido de novo usuário
 - Tentativa de registro com email existente
 - Validação de formato de email
+
+**API (01-user-registration.cy.js)**
+- Criação de novo usuário via API
+- Criação e deleção de usuário via API
+- Busca de usuário por ID via API
 
 ### 3. Navegação e Fluxo do Usuário (03-navigation-flow.cy.js)
 - Navegação pelo sistema e logout
 - Funcionalidade de busca de produtos
 - Validação de responsividade
 
+### 4. Gerenciamento de Produtos via API (3-create-product.cy.js)
+- Criação de produto com autenticação
+- Busca de produto por ID
+- Deleção de produto com autenticação
+
 ## Estrutura do Projeto
 
 ```
 cypress-frontend-automation/
 ├── cypress/
-│   ├── e2e/                    # Cenários de teste
-│   │   ├── 01-authentication.cy.js
-│   │   ├── 02-user-registration.cy.js
-│   │   └── 03-navigation-flow.cy.js
+│   ├── e2e/                    # Cenários de teste organizados por tipo
+│   │   ├── API/                # Testes de API
+│   │   │   ├── 01-user-registration.cy.js
+│   │   │   ├── 02-authentication.cy.js
+│   │   │   └── 3-create-product.cy.js
+│   │   └── Front/              # Testes de Frontend (E2E)
+│   │       ├── 01-user-registration.cy.js
+│   │       ├── 02-authentication.cy.js
+│   │       └── 03-navigation-flow.cy.js
 │   ├── fixtures/               # Dados de teste
 │   │   └── testData.json
 │   ├── page-elements/          # Elementos das páginas
@@ -46,7 +68,7 @@ cypress-frontend-automation/
 │   │   ├── RegisterPage.js
 │   │   └── HomePage.js
 │   └── support/                # Configurações e comandos
-│       ├── commands.js
+│       ├── commands.js         # Comandos customizados (UI + API)
 │       └── e2e.js
 ├── cypress.config.js           # Configuração do Cypress
 ├── package.json               # Dependências e scripts
@@ -69,9 +91,12 @@ cd cypress-frontend-automation
 
 # Instalar dependências
 npm install
+
+# Instalar biblioteca para testes de API avançados
+npm install --save-dev @bahmutov/cy-api
 ```
 
-## Executando os Testes
+### Executando os Testes
 
 ### Modo Interativo (Cypress Test Runner)
 ```bash
@@ -82,6 +107,12 @@ npm run cy:open
 ```bash
 # Executar todos os testes
 npm test
+
+# Executar todos os testes API
+npm run cy:run -- --spec "cypress/e2e/API/**/*.cy.js"
+
+# Executar todos os testes Frontend
+npm run cy:run -- --spec "cypress/e2e/Front/**/*.cy.js"
 
 # Executar com interface gráfica
 npm run cy:run:headed
@@ -101,10 +132,21 @@ O projeto utiliza o padrão Page Object Model com uma abordagem híbrida:
 - **Fixtures**: Para gerenciamento centralizado de dados de teste
 
 ### Comandos Customizados
+**Comandos de UI:**
 - `cy.loginUser()` - Login rápido para setup
 - `cy.registerUser()` - Registro de usuário
 - `cy.generateTestData()` - Geração de dados únicos de teste
 - `cy.authenticateUser()` - Autenticação completa para beforeEach
+
+**Comandos de API:**
+- `cy.apiLogin()` - Login via API com validações completas
+- `cy.getAuthToken()` - Obtenção de token de autorização reutilizável
+- `cy.apiCreateUser()` - Criação de usuário administrador via API
+- `cy.apiDeleteUser()` - Deleção de usuário por ID via API
+- `cy.apiFindUser()` - Busca de usuário por ID via API
+- `cy.apiCreateProduct()` - Criação de produto com autenticação
+- `cy.apiFindProduct()` - Busca de produto (cria produto + busca por ID)
+- `cy.apiDeleteProduct()` - Deleção de produto (cria produto + deleta)
 
 ### Organização dos Dados de Teste
 - Fixtures para dados reutilizáveis
@@ -127,21 +169,13 @@ O projeto usa uma abordagem centralizada para gerenciamento de dados:
 ```json
 {
   "users": {
-    "valid": {
-      "name": "Fulano da Silva",
-      "email": "fulano@qa.com",
-      "password": "teste"
-    },
-    "invalidCredentials": {
-      "email": "nonexistent@user.com",
-      "password": "wrongpassword123"
-    }
+    "valid": { "name": "...", "email": "...", "password": "..." }
   },
-  "navigation": {
-    "paths": { "home": "/home", "login": "/login" },
-    "links": { "products": "a:contains(\"Produtos\")" }
-  },
-  "timing": { "short": 1000, "medium": 2000 }
+  "api": {
+    "baseUrl": "https://serverest.dev",
+    "endpoints": { "login": "/login", "register": "/usuarios" },
+    "statusCode": { "success": 200, "created": 201 }
+  }
 }
 ```
 
@@ -151,24 +185,35 @@ O projeto usa uma abordagem centralizada para gerenciamento de dados:
 - Flexibilidade para diferentes ambientes
 - Reutilização entre arquivos de teste
 - Controle de versão dos dados
+- Configuração de endpoints de API
+- Padronização de mensagens de resposta
+- Dados de produto reutilizáveis para testes API
 
 ## Resultados dos Testes
 
-Todos os 9 cenários de teste estão aprovados e funcionando corretamente:
+Todos os 16 cenários de teste estão aprovados e funcionando corretamente:
 
+**Testes de Frontend:**
 - **Testes de Autenticação:** 3/3 aprovados
 - **Testes de Registro:** 3/3 aprovados  
 - **Testes de Navegação:** 3/3 aprovados
 
-O projeto implementa com sucesso testes E2E com seletores realistas, tratamento adequado de erros e validações robustas.
+**Testes de API:**
+- **Testes de Autenticação API:** 3/3 aprovados
+- **Testes de Registro API:** 3/3 aprovados
+- **Testes de Produtos API:** 3/3 aprovados
+
+O projeto implementa com sucesso testes E2E e de API com seletores realistas, autenticação JWT, tratamento adequado de erros e validações robustas.
 
 ## Configuração do Cypress
 
 ### Principais configurações (cypress.config.js)
 - **baseUrl:** https://front.serverest.dev
+- **API baseUrl:** https://serverest.dev (configurado via fixtures)
 - **timeouts:** 10 segundos
 - **video:** Habilitado para debug
 - **screenshots:** Em caso de falha
+- **Autenticação JWT:** Gerenciada via tokens para testes de API
 
 ### Comandos Disponíveis
 
@@ -179,6 +224,42 @@ O projeto implementa com sucesso testes E2E com seletores realistas, tratamento 
 | `npm run cy:run:headed` | Executa com interface gráfica |
 | `npm run cy:run:chrome` | Executa especificamente no Chrome |
 | `npm test` | Alias para execução de testes |
+| `npm run cy:run -- --spec "cypress/e2e/API/**/*.cy.js"` | Executa apenas testes de API |
+| `npm run cy:run -- --spec "cypress/e2e/Front/**/*.cy.js"` | Executa apenas testes de Frontend |
+
+## Inspeção de Requests e Debug
+
+### Logs de Requisições API
+Para inspecionar requests feitas com `cy.request()`:
+
+```javascript
+// Usar cy.log para Command Log do Cypress
+cy.log('Token obtido:', authToken.substring(0, 20) + '...')
+
+// Usar console.log para terminal/browser console
+console.log('Request options:', {
+  method: 'POST',
+  url: '/produtos',
+  headers: { Authorization: authToken.substring(0, 20) + '...' }
+})
+```
+
+### Interceptação de Requests XHR/Fetch
+Para requests feitas pelo navegador:
+
+```javascript
+cy.intercept('POST', '**/produtos').as('createProduct')
+cy.wait('@createProduct').then(({ request, response }) => {
+  cy.log('Request headers:', JSON.stringify(request.headers))
+  console.log('Intercept response:', response)
+})
+```
+
+### Boas Práticas de Logging
+- Mascarar tokens em logs para evitar vazamento em CI
+- Usar `cy.log()` para visualização no Test Runner
+- Usar `console.log()` para debug detalhado no terminal
+- Inspecionar headers e responses no painel direito do Cypress
 
 ## Relatórios e Evidências
 
@@ -208,6 +289,9 @@ O projeto utiliza seletores CSS robustos como estratégia principal de seleção
 - Testes de acessibilidade
 - Testes de performance
 - Integração com ferramentas de monitoramento
+- Testes de contrato para APIs
+- Implementação de mocks para cenários específicos
+- Cobertura de testes de componente
 
 ## Contribuindo
 
@@ -225,4 +309,4 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ---
 
-**Desenvolvido com foco em qualidade e boas práticas de automação de testes**
+**Desenvolvido com foco em qualidade e boas práticas de automação de testes E2E e API**
