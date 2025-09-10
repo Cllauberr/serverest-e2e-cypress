@@ -3,7 +3,7 @@ describe('API Tests - Products', () => {
         cy.fixture('testData').then((testData) => {
             cy.apiCreateProduct().then((response) => {
                 // Validações do status da resposta
-                expect(response.status).to.eq(201)
+                expect(response.status).to.eq(testData.api.statusCode.created)
                 expect(response.statusText).to.eq('Created')
 
                 // Validações do corpo da resposta
@@ -19,7 +19,7 @@ describe('API Tests - Products', () => {
         cy.fixture('testData').then((testData) => {
             cy.apiFindProduct().then((response) => {
                 // Validações do status da resposta
-                expect(response.status).to.eq(200)
+                expect(response.status).to.eq(testData.api.statusCode.success)
                 expect(response.statusText).to.eq('OK')
 
                 // Validações do corpo da resposta
@@ -38,7 +38,7 @@ describe('API Tests - Products', () => {
         cy.fixture('testData').then((testData) => {
             cy.apiDeleteProduct().then((response) => {
                 // Validações do status da resposta
-                expect(response.status).to.eq(200)
+                expect(response.status).to.eq(testData.api.statusCode.success)
                 expect(response.statusText).to.eq('OK')
 
                 // Validações do corpo da resposta

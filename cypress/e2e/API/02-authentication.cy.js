@@ -1,21 +1,23 @@
 describe('API Tests - Authentication', () => {
 
     it('should login successfully via API', () => {
-        cy.apiLogin().then((response) => {
-            // Validações do status da resposta
-            expect(response.status).to.eq(200)
-            expect(response.statusText).to.eq('OK')
-            
-            // Validações do corpo da resposta
-            expect(response.body).to.have.property('message')
-            expect(response.body).to.have.property('authorization')
-            expect(response.body.message).to.eq('Login realizado com sucesso')
-            
-            // Validações do token de autorização
-            const token = response.body.authorization
-            expect(token).to.exist
-            expect(token).to.be.a('string')
-            expect(token).to.have.length.greaterThan(0)
+        cy.fixture('testData').then((testData) => {
+            cy.apiLogin().then((response) => {
+                // Validações do status da resposta
+                expect(response.status).to.eq(200)
+                expect(response.statusText).to.eq('OK')
+                
+                // Validações do corpo da resposta
+                expect(response.body).to.have.property('message')
+                expect(response.body).to.have.property('authorization')
+                expect(response.body.message).to.eq(testData.api.messages.loginSuccess)
+                
+                // Validações do token de autorização
+                const token = response.body.authorization
+                expect(token).to.exist
+                expect(token).to.be.a('string')
+                expect(token).to.have.length.greaterThan(0)
+            })
         })
     })
 
@@ -55,7 +57,7 @@ describe('API Tests - Authentication', () => {
                 },
                 failOnStatusCode: false
             }).then((response) => {
-                expect(response.status).to.eq(400)
+                expect(response.status).to.eq(testData.api.statusCode.badRequest)
                 expect(response.body).to.have.property('email')
                 expect(response.body.email).to.include('obrigatório')
             })
