@@ -1,6 +1,7 @@
 import LoginPageElements from '../page-elements/LoginPageElements'
 import RegisterPageElements from '../page-elements/RegisterPageElements'
-import '@bahmutov/cy-api'
+
+// UI Commands
 
 // login
 Cypress.Commands.add('loginUser', (email, password) => {
@@ -37,50 +38,58 @@ Cypress.Commands.add('authenticateUser', (userData = null) => {
   })
 })
 
+// API Helper - função centralizada para requisições
+const ApiRequest = (method, endpoint, options = {}) => {
+  return cy.fixture('testData').then((testData) => {
+    const config = {
+      method,
+      url: `${testData.api.baseUrl}${endpoint}`,
+      ...options
+    }
+    return cy.request(config)
+  })
+}
+
 // API Commands
 
-//Realiza o login e retorna o token de autorização
+// Realiza o login e retorna o token de autorização
 Cypress.Commands.add('getAuthToken', (email = null, password = null) => {
   return cy.fixture('testData').then((testData) => {
     const auth = {
       email: email || testData.users.valid.email,
       password: password || testData.users.valid.password
     }
-    return cy.request({
-      method: 'POST',
-      url: `${testData.api.baseUrl}${testData.api.endpoints.login}`,
-      body: auth
-    }).then((response) => {
-      expect(response.status).to.eq(testData.api.statusCode.success)
-      expect(response.body).to.have.property('authorization')
-      return response.body.authorization
-    })
+    
+    return ApiRequest('POST', testData.api.endpoints.login, { body: auth })
+      .then((response) => {
+        expect(response.status).to.eq(testData.api.statusCode.success)
+        expect(response.body).to.have.property('authorization')
+        return response.body.authorization
+      })
   })
 })
 
-//Realiza o login de sucesso
+// Realiza o login de sucesso
 Cypress.Commands.add('apiLogin', (email = null, password = null) => {
-  cy.fixture('testData').then((testData) => {
+  return cy.fixture('testData').then((testData) => {
     const auth = {
       email: email || testData.users.valid.email,
       password: password || testData.users.valid.password
     }
-    cy.request({
-      method: 'POST',
-      url: `${testData.api.baseUrl}${testData.api.endpoints.login}`,
-      body: auth
-    }).then((response) => {
-      expect(response.status).to.eq(testData.api.statusCode.success)
-      expect(response.body).to.have.property('authorization')
-      expect(response.body.message).to.eq(testData.api.messages.loginSuccess)
-      return response
-    })
+    
+    return ApiRequest('POST', testData.api.endpoints.login, { body: auth })
+      .then((response) => {
+        expect(response.status).to.eq(testData.api.statusCode.success)
+        expect(response.body).to.have.property('authorization')
+        expect(response.body.message).to.eq(testData.api.messages.loginSuccess)
+        return response
+      })
   })
 })
 
-//Realiza o cadastro de um usuário Admin
+// Realiza o cadastro de um usuário Admin
 Cypress.Commands.add('apiCreateUser', (userData = null) => {
-  cy.fixture('testData').then((testData) => {
+  return cy.fixture('testData').then((testData) => {
     const timestamp = Date.now()
     const user = userData || {
       nome: `API User ${timestamp}`,
@@ -89,50 +98,53 @@ Cypress.Commands.add('apiCreateUser', (userData = null) => {
       administrador: 'true'
     }
 
-    cy.request({
-      method: 'POST',
-      url: `${testData.api.baseUrl}${testData.api.endpoints.register}`,
-      body: user
-    }).then((response) => {
-      expect(response.status).to.eq(testData.api.statusCode.created)
-      expect(response.body.message).to.eq(testData.api.messages.userCreated)
-      return response
-    })
+    return ApiRequest('POST', testData.api.endpoints.register, { body: user })
+      .then((response) => {
+        expect(response.status).to.eq(testData.api.statusCode.created)
+        expect(response.body.message).to.eq(testData.api.messages.userCreated)
+        return response
+      })
   })
 })
 
-//Realiza a deleção de um usuário por ID
+// Realiza a deleção de um usuário por ID
 Cypress.Commands.add('apiDeleteUser', (userId) => {
-  cy.fixture('testData').then((testData) => {
-    cy.request({
-      method: 'DELETE',
-      url: `${testData.api.baseUrl}${testData.api.endpoints.delete}${userId}`
-    }).then((response) => {
-      expect(response.status).to.eq(testData.api.statusCode.success)
-      expect(response.body).to.have.property('message')
-      expect(response.body.message).to.eq(testData.api.messages.userDeleted)
-      return response
-    })
+  return cy.fixture('testData').then((testData) => {
+    return ApiRequest('DELETE', `${testData.api.endpoints.delete}${userId}`)
+      .then((response) => {
+        expect(response.status).to.eq(testData.api.statusCode.success)
+        expect(response.body.message).to.eq(testData.api.messages.userDeleted)
+        return response
+      })
   })
 })
 
-//Realiza a busca de um usuário por ID
+// Realiza a busca de um usuário por ID
 Cypress.Commands.add('apiFindUser', (userId = null) => {
-  cy.fixture('testData').then((testData) => {
-    const findUserId = userId || testData.users.valid._id
+  return cy.fixture('testData').then((testData) => {
+    // Se não foi fornecido userId, criar um usuário e buscar por ele
+    if (!userId) {
+      return cy.apiCreateUser().then((createResponse) => {
+        const createdUserId = createResponse.body._id
+        return ApiRequest('GET', `${testData.api.endpoints.find}${createdUserId}`)
+          .then((response) => {
+            expect(response.status).to.eq(testData.api.statusCode.success)
+            expect(response.body).to.have.property('_id', createdUserId)
+            return response
+          })
+      })
+    }
     
-    cy.request({
-      method: 'GET',
-      url: `${testData.api.baseUrl}${testData.api.endpoints.find}${findUserId}`
-    }).then((response) => {
-      expect(response.status).to.eq(testData.api.statusCode.success)
-      expect(response.body).to.have.property('_id', findUserId)
-      return response
-    })
+    return ApiRequest('GET', `${testData.api.endpoints.find}${userId}`)
+      .then((response) => {
+        expect(response.status).to.eq(testData.api.statusCode.success)
+        expect(response.body).to.have.property('_id', userId)
+        return response
+      })
   })
 })
 
-//Realiza o cadastro de um produto
+// Realiza o cadastro de um produto
 Cypress.Commands.add('apiCreateProduct', (productData = null) => {
   return cy.fixture('testData').then((testData) => {
     const timestamp = Date.now()
@@ -143,12 +155,8 @@ Cypress.Commands.add('apiCreateProduct', (productData = null) => {
 
     // Obter o token de autorização usando o comando getAuthToken
     return cy.getAuthToken().then((authToken) => {
-      return cy.api({
-        method: 'POST',
-        url: `${testData.api.baseUrl}${testData.api.endpoints.products}`,
-        headers: {
-          'Authorization': authToken
-        },
+      return ApiRequest('POST', testData.api.endpoints.products, {
+        headers: { 'Authorization': authToken },
         body: product
       }).then((response) => {
         expect(response.status).to.eq(testData.api.statusCode.created)
@@ -158,47 +166,41 @@ Cypress.Commands.add('apiCreateProduct', (productData = null) => {
   })
 })
 
-//Realiza a busca de um produto
+// Realiza a busca de um produto
 Cypress.Commands.add('apiFindProduct', () => {
-  cy.fixture('testData').then((testData) => {
-    //Cria um produto
-    cy.apiCreateProduct().then((createResponse) => {
+  return cy.fixture('testData').then((testData) => {
+    // Cria um produto
+    return cy.apiCreateProduct().then((createResponse) => {
       const productId = createResponse.body._id
-
+      
       // Validações da criação
       expect(createResponse.status).to.eq(201)
       expect(productId).to.exist
 
       // Busca o produto usando o ID
-      cy.api({
-        method: 'GET',
-        url: `${testData.api.baseUrl}${testData.api.endpoints.productsFind}${productId}`
-      }).then((response) => {
-        expect(response.status).to.eq(testData.api.statusCode.success)
-        return response
-      })
+      return ApiRequest('GET', `${testData.api.endpoints.productsFind}${productId}`)
+        .then((response) => {
+          expect(response.status).to.eq(testData.api.statusCode.success)
+          return response
+        })
     })
   })
 })
 
-//Realiza a deleção de um produto
+// Realiza a deleção de um produto
 Cypress.Commands.add('apiDeleteProduct', () => {
   return cy.fixture('testData').then((testData) => {
     return cy.apiCreateProduct().then((createResponse) => {
       const productId = createResponse.body._id
-
+      
       // Validações da criação
       expect(createResponse.status).to.eq(201)
       expect(productId).to.exist
       
       // Obter token para deleção
       return cy.getAuthToken().then((authToken) => {
-        return cy.api({
-          method: 'DELETE',
-          url: `${testData.api.baseUrl}${testData.api.endpoints.productsDelete}${productId}`,
-          headers: {
-            'Authorization': authToken
-          }
+        return ApiRequest('DELETE', `${testData.api.endpoints.productsDelete}${productId}`, {
+          headers: { 'Authorization': authToken }
         }).then((response) => {
           expect(response.status).to.eq(testData.api.statusCode.success)
           return response
