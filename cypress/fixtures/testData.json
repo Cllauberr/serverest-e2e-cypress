@@ -1,14 +1,14 @@
 {
   "users": {
     "valid": {
-      "name": "Valido da Silva",
-      "email": "adminautomatizador@qa.com",
+      "name": "Admin Teste Automatizado",
+      "email": "admintest123@qa.com",
       "password": "test123",
-      "_id": "moui4Nlp9jyEkBTE"
+      "_id": "xYgPzNgq5pOj1fX1"
     },
     "admin": {
-      "name": "Admin Test da Silva",
-      "email": "adminautomatizador@qa.com", 
+      "name": "Admin Teste Automatizado",
+      "email": "admintest123@qa.com", 
       "password": "test123",
       "isAdmin": "true"
     },
