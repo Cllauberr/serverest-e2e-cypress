@@ -92,9 +92,14 @@ cd cypress-frontend-automation
 # Instalar dependências
 npm install
 
-# Instalar biblioteca para testes de API avançados
+# Instalar biblioteca para testes de API avançados (já incluída no package.json)
 npm install --save-dev @bahmutov/cy-api
 ```
+
+**Problema Conhecido:** Os testes de API estão falhando devido a credenciais expiradas. Para corrigi-los:
+1. Crie um novo usuário admin via API
+2. Atualize as credenciais no arquivo `cypress/fixtures/testData.json`
+3. Execute novamente os testes
 
 ### Executando os Testes
 
@@ -191,7 +196,7 @@ O projeto usa uma abordagem centralizada para gerenciamento de dados:
 
 ## Resultados dos Testes
 
-Todos os 16 cenários de teste estão aprovados e funcionando corretamente:
+**Status Atual dos Testes:**
 
 **Testes de Frontend:**
 - **Testes de Autenticação:** 3/3 aprovados
@@ -199,11 +204,13 @@ Todos os 16 cenários de teste estão aprovados e funcionando corretamente:
 - **Testes de Navegação:** 3/3 aprovados
 
 **Testes de API:**
-- **Testes de Autenticação API:** 3/3 aprovados
+- **Testes de Autenticação API:** 2/3 (1 falha - credenciais)
 - **Testes de Registro API:** 3/3 aprovados
-- **Testes de Produtos API:** 3/3 aprovados
+- **Testes de Produtos API:** 0/3 (falhas de autenticação)
 
-O projeto implementa com sucesso testes E2E e de API com seletores realistas, autenticação JWT, tratamento adequado de erros e validações robustas.
+**Total:** 13/18 testes passando (72% - necessária atualização de credenciais API)
+
+**Nota:** Os testes de API estão falhando devido a credenciais expiradas. É necessário atualizar o arquivo `testData.json` com usuário administrador válido.
 
 ## Configuração do Cypress
 
@@ -211,9 +218,11 @@ O projeto implementa com sucesso testes E2E e de API com seletores realistas, au
 - **baseUrl:** https://front.serverest.dev
 - **API baseUrl:** https://serverest.dev (configurado via fixtures)
 - **timeouts:** 10 segundos
-- **video:** Habilitado para debug
-- **screenshots:** Em caso de falha
+- **video:** Desabilitado (para performance)
+- **screenshots:** Desabilitados em falhas (para performance)
 - **Autenticação JWT:** Gerenciada via tokens para testes de API
+
+**Importante:** Para debug, habilite `video: true` e `screenshotOnRunFailure: true` no cypress.config.js
 
 ### Comandos Disponíveis
 
